@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>青色申告帳簿システム</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--b6:#2563eb;--b5:#3b82f6;--b1:#dbeafe;--b0:#eff6ff;--p6:#9333ea;--p1:#e9d5ff;--p0:#faf5ff;--s9:#0f172a;--s8:#1e293b;--s7:#334155;--s6:#475569;--s5:#64748b;--s4:#94a3b8;--s3:#cbd5e1;--s2:#e2e8f0;--s1:#f1f5f9;--s0:#f8fafc;--g6:#059669;--g0:#ecfdf5;--r6:#dc2626;--r0:#fef2f2;--a0:#fffbeb;--a2:#fde68a;--a5:#f59e0b;--a8:#92400e;--bg:#f0f4f8}
+body{font-family:'Noto Sans JP','Hiragino Sans','Meiryo',sans-serif;background:var(--bg);color:var(--s9);line-height:1.6;min-height:100vh}
+.header{background:linear-gradient(135deg,var(--s8),var(--s7));color:#fff;border-bottom:3px solid var(--b5)}
+.header-inner{max-width:1200px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--b5),var(--p6));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;flex-shrink:0}
+.header h1{font-size:22px;font-weight:800}.header .sub{font-size:13px;opacity:.7}
+.header-right{display:flex;align-items:center;gap:10px}
+.ysel{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:14px}
+.ysel option{color:#333}
+.hbtn{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.hp{background:var(--a0);border-bottom:1px solid var(--a2);padding:16px 0;display:none}.hp.show{display:block}
+.hp-in{max-width:1200px;margin:0 auto;padding:0 24px}.hp h3{margin:0 0 8px;font-size:16px;color:var(--a8)}.hp p{margin:4px 0;font-size:14px;color:#78350f;line-height:1.6}
+.hcl{margin-top:8px;padding:4px 12px;background:var(--a5);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600}
+.nav{background:#fff;border-bottom:1px solid var(--s2);position:sticky;top:0;z-index:10}
+.nav-in{max-width:1200px;margin:0 auto;display:flex;overflow-x:auto;padding:0 16px}
+.tb{padding:12px 18px;border:none;background:0 0;cursor:pointer;font-size:14px;font-weight:600;color:var(--s5);border-bottom:3px solid transparent;transition:.15s;display:flex;align-items:center;gap:6px;white-space:nowrap;font-family:inherit}
+.tb:hover{color:var(--b6);background:var(--b0)}.tb.active{color:var(--b6);border-bottom-color:var(--b5);background:var(--b0)}
+.sbar{background:#fff;border-bottom:1px solid var(--s2)}.sbar-in{max-width:1200px;margin:0 auto;display:flex;padding:0 24px;flex-wrap:wrap}
+.si{display:flex;flex-direction:column;padding:12px 20px;border-right:1px solid var(--s1);min-width:120px}
+.sl{font-size:11px;color:var(--s4);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.sv{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.mc{max-width:1200px;margin:0 auto;padding:24px}
+.tc{display:none}.tc.active{display:block}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:24px;margin-bottom:24px}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.ct{margin:0 0 16px;font-size:18px;font-weight:800;color:var(--s8)}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.fgr{display:flex;flex-direction:column;gap:4px}.fgr.full{grid-column:1/-1}
+.fl{font-size:12px;font-weight:700;color:var(--s6);text-transform:uppercase;letter-spacing:.04em}
+.fi,.fsel{padding:10px 12px;border-radius:8px;border:1.5px solid var(--s2);font-size:14px;outline:none;background:var(--s0);font-family:inherit}
+.fi:focus,.fsel:focus{border-color:var(--b5)}
+.fa{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.bp{padding:10px 28px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--b5),var(--b6));color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.bs2{padding:10px 20px;border-radius:8px;border:1.5px solid var(--s2);background:#fff;color:var(--s6);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.bpdf{padding:10px 20px;border-radius:8px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.bpdf2{padding:10px 20px;border-radius:8px;border:none;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.bpdf:hover,.bpdf2:hover,.bp:hover{filter:brightness(1.1)}
+.bcan{padding:6px 14px;border-radius:6px;border:1.5px solid #fca5a5;background:var(--r0);color:var(--r6);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:none}.bcan.show{display:inline-block}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{padding:10px 14px;text-align:left;background:var(--s0);border-bottom:2px solid var(--s2);font-size:12px;font-weight:700;color:var(--s5);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+th.r{text-align:right}th.c{text-align:center}
+td{padding:10px 14px;font-size:14px}
+tr.rw{border-bottom:1px solid var(--s1)}tr.rw:hover{background:var(--s0)}
+td.r{text-align:right;font-variant-numeric:tabular-nums}td.dc{color:var(--b6);font-weight:600}td.cc{color:var(--p6);font-weight:600}td.mu{color:var(--s5);font-size:13px}td.bo{font-weight:700}
+.ib{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 6px;border-radius:4px}.ib:hover{background:var(--s1)}
+.em{text-align:center;color:var(--s4);padding:40px 14px}
+tr.tot{background:var(--s1)}tr.tot td{font-weight:800;font-variant-numeric:tabular-nums}
+tr.sh td{font-weight:700;background:var(--s0);color:var(--s7);border-bottom:2px solid var(--s2)}
+tr.si2 td{padding-left:28px}
+.cw{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.cb{padding:6px 14px;border-radius:20px;border:1.5px solid var(--s2);background:#fff;color:var(--s6);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.cb:hover{border-color:var(--b5);color:var(--b6)}.cb.active{background:var(--b5);color:#fff;border-color:var(--b5)}
+.stb{margin-top:16px;padding:12px 16px;border-radius:8px;font-weight:600;font-size:14px}.stb.ok{background:var(--g0);color:#065f46}.stb.ng{background:var(--r0);color:#991b1b}
+.bsg{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.bsh{margin:0 0 12px;font-size:15px;font-weight:800;color:var(--s7);border-bottom:2px solid var(--s2);padding-bottom:8px}
+tr.ag td{font-weight:600;background:var(--b0);color:#1e40af;font-size:13px}
+tr.lg td{font-weight:600;background:var(--p0);color:#7e22ce;font-size:13px}
+tr.at td{background:var(--b1);font-weight:800}
+tr.lt td{background:var(--p0);font-weight:700}
+tr.et td{background:var(--p1);font-weight:800}
+tr.ir td{padding-left:20px;font-weight:600;color:var(--g6)}
+.plc{text-align:center;margin-bottom:20px}.plc p{color:var(--s5);font-size:13px}
+tr.plt td{background:var(--s1);font-weight:700}
+tr.plgt td{background:var(--s1);font-weight:800;font-size:15px}
+.pa{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.footer{text-align:center;padding:24px;color:var(--s4);font-size:12px;border-top:1px solid var(--s2);margin-top:40px}
+@media(max-width:768px){.header-inner{padding:12px 16px}.header h1{font-size:18px}.si{min-width:100px;padding:10px 14px}.sv{font-size:15px}.mc{padding:16px}.card{padding:16px}.fg{grid-template-columns:1fr}.bsg{grid-template-columns:1fr}.tb{padding:10px 12px;font-size:13px}}
+</style>
+</head>
+<body>
+
+<header class="header"><div class="header-inner">
+<div class="header-left"><div class="logo">帳</div><div><h1>青色申告帳簿システム</h1><p class="sub">複式簿記 ・ 65万円控除対応</p></div></div>
+<div class="header-right"><span style="font-size:13px;opacity:.8">会計年度</span>
+<select id="fy" class="ysel" onchange="render()"><option value="2024">2024年</option><option value="2025" selected>2025年</option><option value="2026">2026年</option></select>
+<button class="hbtn" onclick="document.getElementById('hp').classList.toggle('show')">？</button>
+</div></div></header>
+
+<div id="hp" class="hp"><div class="hp-in">
+<h3>使い方ガイド</h3>
+<p><b>①仕訳入力</b>：日付・借方・貸方・金額・摘要を入力して「登録」。</p>
+<p><b>②帳簿閲覧</b>：タブで仕訳帳・総勘定元帳・試算表・損益計算書・貸借対照表を切替。</p>
+<p><b>③PDF出力</b>：各タブの赤い「PDF出力」ボタンを押すと印刷画面が開きます。送信先を「PDFに保存」にして保存してください。</p>
+<p><b>④CSV出力</b>：仕訳帳タブの「CSV出力」でデータをダウンロード。</p>
+<p><b>⑤データ保存</b>：ブラウザに自動保存。同じPC・ブラウザで再開可能。</p>
+<button class="hcl" onclick="document.getElementById('hp').classList.remove('show')">閉じる</button>
+</div></div>
+
+<nav class="nav"><div class="nav-in">
+<button class="tb active" data-tab="journal" onclick="sw('journal')">📝 仕訳帳</button>
+<button class="tb" data-tab="ledger" onclick="sw('ledger')">📖 総勘定元帳</button>
+<button class="tb" data-tab="trial" onclick="sw('trial')">⚖️ 試算表</button>
+<button class="tb" data-tab="income" onclick="sw('income')">📊 損益計算書</button>
+<button class="tb" data-tab="balance" onclick="sw('balance')">🏛️ 貸借対照表</button>
+</div></nav>
+
+<div class="sbar"><div class="sbar-in" id="sumBar"></div></div>
+
+<div class="mc">
+<div id="tab-journal" class="tc active">
+<div class="card" id="jform">
+<div class="ch"><h2 class="ct" id="fTitle">新しい仕訳を入力</h2><button class="bcan" id="canBtn" onclick="canEdit()">キャンセル</button></div>
+<div class="fg">
+<div class="fgr"><label class="fl">日付</label><input type="date" id="iDate" class="fi"></div>
+<div class="fgr"><label class="fl">借方科目（左）</label><select id="iDeb" class="fsel"></select></div>
+<div class="fgr"><label class="fl">貸方科目（右）</label><select id="iCre" class="fsel"></select></div>
+<div class="fgr"><label class="fl">金額（円）</label><input type="number" id="iAmt" class="fi" min="1" placeholder="0"></div>
+<div class="fgr full"><label class="fl">摘要</label><input type="text" id="iDsc" class="fi" placeholder="取引の内容を記入"></div>
+</div>
+<div class="fa">
+<button class="bp" id="subBtn" onclick="sub()">登録</button>
+<button class="bs2" onclick="expCSV()">📥 CSV出力</button>
+<button class="bpdf" onclick="printPDF('journal')">📄 PDF出力</button>
+</div></div>
+<div class="card"><h2 class="ct">仕訳帳</h2><div class="tw" id="jTbl"></div></div>
+</div>
+
+<div id="tab-ledger" class="tc"><div class="card">
+<h2 class="ct">総勘定元帳</h2>
+<div class="cw" id="lChips"></div>
+<div class="pa"><button class="bpdf" onclick="printPDF('ledger')">📄 この科目をPDF出力</button><button class="bpdf2" onclick="printPDF('ledgerAll')">📄 全科目PDF出力</button></div>
+<div class="tw" id="lTbl"></div>
+</div></div>
+
+<div id="tab-trial" class="tc"><div class="card">
+<div class="ch"><h2 class="ct" style="margin-bottom:0">合計残高試算表</h2><button class="bpdf" onclick="printPDF('trial')">📄 PDF出力</button></div>
+<div class="tw" id="tTbl"></div><div id="tSt"></div>
+</div></div>
+
+<div id="tab-income" class="tc"><div class="card">
+<div class="ch"><h2 class="ct" style="margin-bottom:0">損益計算書</h2><button class="bpdf" onclick="printPDF('income')">📄 PDF出力</button></div>
+<div id="plC"></div>
+</div></div>
+
+<div id="tab-balance" class="tc"><div class="card">
+<div class="ch"><h2 class="ct" style="margin-bottom:0">貸借対照表</h2><button class="bpdf" onclick="printPDF('balance')">📄 PDF出力</button></div>
+<div id="bsC"></div>
+</div></div>
+</div>
+
+<footer class="footer"><p>青色申告帳簿システム — 個人事業主向け複式簿記（65万円控除対応）</p></footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// 勘定科目マスタ & サンプルデータ
+// 各科目は code / name / category / group で定義
+// category: asset(資産) / liability(負債) / equity(資本) / revenue(収益) / expense(費用)
+// ═══════════════════════════════════════════════════════════
+const AC=[
+{c:"100",n:"現金",cat:"asset",g:"流動資産"},{c:"110",n:"普通預金",cat:"asset",g:"流動資産"},
+{c:"115",n:"電子マネー",cat:"asset",g:"流動資産"},{c:"120",n:"売掛金",cat:"asset",g:"流動資産"},{c:"130",n:"商品",cat:"asset",g:"流動資産"},
+{c:"140",n:"前払費用",cat:"asset",g:"流動資産"},{c:"150",n:"貯蔵品",cat:"asset",g:"流動資産"},
+{c:"200",n:"建物",cat:"asset",g:"固定資産"},{c:"210",n:"車両運搬具",cat:"asset",g:"固定資産"},
+{c:"220",n:"工具器具備品",cat:"asset",g:"固定資産"},{c:"230",n:"土地",cat:"asset",g:"固定資産"},
+{c:"290",n:"建物減価償却累計額",cat:"asset",g:"固定資産"},{c:"291",n:"車両減価償却累計額",cat:"asset",g:"固定資産"},
+{c:"292",n:"備品減価償却累計額",cat:"asset",g:"固定資産"},
+{c:"300",n:"買掛金",cat:"liability",g:"流動負債"},{c:"310",n:"未払金",cat:"liability",g:"流動負債"},
+{c:"320",n:"未払費用",cat:"liability",g:"流動負債"},{c:"330",n:"預り金",cat:"liability",g:"流動負債"},
+{c:"340",n:"前受金",cat:"liability",g:"流動負債"},{c:"350",n:"借入金",cat:"liability",g:"固定負債"},
+{c:"400",n:"元入金",cat:"equity",g:"資本"},{c:"410",n:"事業主借",cat:"equity",g:"資本"},
+{c:"420",n:"事業主貸",cat:"equity",g:"資本"},
+{c:"500",n:"売上高",cat:"revenue",g:"売上"},{c:"510",n:"雑収入",cat:"revenue",g:"営業外収益"},
+{c:"520",n:"受取利息",cat:"revenue",g:"営業外収益"},
+{c:"600",n:"仕入高",cat:"expense",g:"売上原価"},
+{c:"700",n:"給料賃金",cat:"expense",g:"経費"},{c:"710",n:"外注工賃",cat:"expense",g:"経費"},
+{c:"720",n:"減価償却費",cat:"expense",g:"経費"},{c:"730",n:"地代家賃",cat:"expense",g:"経費"},
+{c:"740",n:"水道光熱費",cat:"expense",g:"経費"},{c:"750",n:"旅費交通費",cat:"expense",g:"経費"},
+{c:"760",n:"通信費",cat:"expense",g:"経費"},{c:"770",n:"広告宣伝費",cat:"expense",g:"経費"},
+{c:"780",n:"接待交際費",cat:"expense",g:"経費"},{c:"790",n:"損害保険料",cat:"expense",g:"経費"},
+{c:"800",n:"修繕費",cat:"expense",g:"経費"},{c:"810",n:"消耗品費",cat:"expense",g:"経費"},
+{c:"820",n:"福利厚生費",cat:"expense",g:"経費"},{c:"830",n:"荷造運賃",cat:"expense",g:"経費"},
+{c:"840",n:"支払手数料",cat:"expense",g:"経費"},{c:"850",n:"租税公課",cat:"expense",g:"経費"},
+{c:"860",n:"新聞図書費",cat:"expense",g:"経費"},{c:"870",n:"諸会費",cat:"expense",g:"経費"},
+{c:"880",n:"支払利息",cat:"expense",g:"営業外費用"},{c:"890",n:"雑費",cat:"expense",g:"経費"}
+];
+const SAM=[
+{id:1,date:"2025-01-05",da:"100",ca:"500",am:300000,ds:"売上代金を現金で受領"},
+{id:2,date:"2025-01-10",da:"730",ca:"110",am:80000,ds:"事務所家賃を普通預金から支払い"},
+{id:3,date:"2025-01-15",da:"810",ca:"100",am:5000,ds:"文房具を現金で購入"},
+{id:4,date:"2025-01-20",da:"110",ca:"500",am:500000,ds:"売上代金が普通預金に入金"},
+{id:5,date:"2025-01-25",da:"750",ca:"100",am:12000,ds:"電車代を現金で支払い"},
+{id:6,date:"2025-01-31",da:"760",ca:"110",am:8000,ds:"インターネット利用料を支払い"}
+];
+const SK="aoiro_v3";let E=[],NI=1,EI=null,SL="";
+const F=n=>n.toLocaleString("ja-JP");const gA=c=>AC.find(a=>a.c===c);const gN=c=>{const a=gA(c);return a?a.n:c};
+function save(){try{localStorage.setItem(SK,JSON.stringify({E,NI}))}catch(e){}}
+function load(){try{const r=localStorage.getItem(SK);if(r){const d=JSON.parse(r);E=d.E||[];NI=d.NI||1;return true}}catch(e){}return false}
+
+// ═══════════════════════════════════════════════════════════
+// 会計計算エンジン
+// cL(): 仕訳データから総勘定元帳(各科目の借方・貸方合計と明細)を生成
+// cT(): 総勘定元帳から試算表(残高試算表)を生成
+// cF(): 総勘定元帳から決算書(P/L, B/S)用データを生成
+// ═══════════════════════════════════════════════════════════
+function cL(){const m={};AC.forEach(a=>{m[a.c]={...a,dt:0,ct:0,it:[]}});E.forEach(e=>{if(m[e.da]){m[e.da].dt+=e.am;m[e.da].it.push({...e,s:"d"})}if(m[e.ca]){m[e.ca].ct+=e.am;m[e.ca].it.push({...e,s:"c"})}});return m}
+function cT(L){const rows=[];let tD=0,tC=0;AC.forEach(a=>{const l=L[a.c];if(!l.dt&&!l.ct)return;let bD=0,bC=0;if(a.cat==="asset"||a.cat==="expense"){const n=l.dt-l.ct;n>=0?bD=n:bC=-n}else{const n=l.ct-l.dt;n>=0?bC=n:bD=-n}tD+=bD;tC+=bC;rows.push({c:a.c,n:a.n,cat:a.cat,dt:l.dt,ct:l.ct,bD,bC})});return{rows,tD,tC}}
+function cF(L){const b={revenue:{},expense:{},asset:{},liability:{},equity:{}},t={revenue:0,expense:0,asset:0,liability:0,equity:0};AC.forEach(a=>{const l=L[a.c];if(!l.dt&&!l.ct)return;let v;if(a.cat==="asset"||a.cat==="expense")v=l.dt-l.ct;else v=l.ct-l.dt;if(v){b[a.cat][a.c]={n:a.n,g:a.g,am:v};t[a.cat]+=v}});return{...b,t,ni:t.revenue-t.expense}}
+
+// ═══════════════════════════════════════════════════════════
+// UI操作（タブ切替・仕訳CRUD・CSV出力）
+// ═══════════════════════════════════════════════════════════
+function sw(t){document.querySelectorAll(".tb").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));document.querySelectorAll(".tc").forEach(c=>c.classList.toggle("active",c.id==="tab-"+t))}
+function popSel(){const h='<option value="">選択してください</option>'+AC.map(a=>'<option value="'+a.c+'">'+a.c+' '+a.n+'</option>').join("");document.getElementById("iDeb").innerHTML=h;document.getElementById("iCre").innerHTML=h}
+function sub(){
+  const dt=document.getElementById("iDate").value,dA=document.getElementById("iDeb").value,cA=document.getElementById("iCre").value,am=parseInt(document.getElementById("iAmt").value,10),ds=document.getElementById("iDsc").value;
+  if(!dt||!dA||!cA||!am){alert("日付・借方・貸方・金額を入力してください");return}
+  if(dA===cA){alert("借方と貸方に同じ科目は不可");return}
+  if(isNaN(am)||am<=0){alert("金額は正の整数で入力");return}
+  if(EI){const i=E.findIndex(e=>e.id===EI);if(i>=0)E[i]={id:EI,date:dt,da:dA,ca:cA,am,ds};EI=null;document.getElementById("fTitle").textContent="新しい仕訳を入力";document.getElementById("subBtn").textContent="登録";document.getElementById("canBtn").classList.remove("show")}
+  else E.push({id:NI++,date:dt,da:dA,ca:cA,am,ds});
+  ["iDate","iDeb","iCre","iAmt","iDsc"].forEach(id=>document.getElementById(id).value="");save();render()
+}
+function edE(id){const e=E.find(x=>x.id===id);if(!e)return;document.getElementById("iDate").value=e.date;document.getElementById("iDeb").value=e.da;document.getElementById("iCre").value=e.ca;document.getElementById("iAmt").value=e.am;document.getElementById("iDsc").value=e.ds;EI=id;document.getElementById("fTitle").textContent="仕訳の編集";document.getElementById("subBtn").textContent="更新";document.getElementById("canBtn").classList.add("show");sw("journal");document.getElementById("jform").scrollIntoView({behavior:"smooth"})}
+function canEdit(){EI=null;document.getElementById("fTitle").textContent="新しい仕訳を入力";document.getElementById("subBtn").textContent="登録";document.getElementById("canBtn").classList.remove("show");["iDate","iDeb","iCre","iAmt","iDsc"].forEach(id=>document.getElementById(id).value="")}
+function delE(id){if(!confirm("この仕訳を削除しますか？"))return;E=E.filter(e=>e.id!==id);save();render()}
+function selLA(c){SL=c;render()}
+function expCSV(){const fy=document.getElementById("fy").value;const h="日付,借方科目,貸方科目,金額,摘要\n";const s=[...E].sort((a,b)=>a.date.localeCompare(b.date));const r=s.map(e=>e.date+","+gN(e.da)+","+gN(e.ca)+","+e.am+","+e.ds).join("\n");const bl=new Blob(["\uFEFF"+h+r],{type:"text/csv;charset=utf-8;"});const u=URL.createObjectURL(bl);const a=document.createElement("a");a.href=u;a.download="仕訳帳_"+fy+".csv";a.click();URL.revokeObjectURL(u)}
+
+// ============================================
+// PDF OUTPUT (Print-based, no external library)
+// ============================================
+function printPDF(type) {
+  const fy = document.getElementById("fy").value;
+  const L = cL(), T = cT(L), fin = cF(L);
+  const now = new Date();
+  const dateStr = now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0');
+  let title = '', subtitle = '', bodyHTML = '';
+
+  if (type === 'journal') {
+    title = '仕訳帳';
+    subtitle = '自 '+fy+'年1月1日　至 '+fy+'年12月31日';
+    const so = [...E].sort((a,b) => a.date.localeCompare(b.date));
+    bodyHTML = '<table><thead><tr><th>日付</th><th>借方科目</th><th class="r">借方金額</th><th>貸方科目</th><th class="r">貸方金額</th><th>摘要</th></tr></thead><tbody>';
+    so.forEach(e => {
+      bodyHTML += '<tr><td>'+e.date+'</td><td>'+gN(e.da)+'</td><td class="r">¥'+F(e.am)+'</td><td>'+gN(e.ca)+'</td><td class="r">¥'+F(e.am)+'</td><td>'+e.ds+'</td></tr>';
+    });
+    bodyHTML += '</tbody></table>';
+  }
+  else if (type === 'ledger') {
+    const d = L[SL];
+    if (!d || !d.it.length) { alert('この科目には取引がありません'); return; }
+    title = '総勘定元帳【' + d.n + '】';
+    subtitle = fy + '年度';
+    bodyHTML = buildLedgerHTML(d);
+  }
+  else if (type === 'ledgerAll') {
+    title = '総勘定元帳（全科目）';
+    subtitle = fy + '年度';
+    const act = AC.filter(a => L[a.c].dt > 0 || L[a.c].ct > 0);
+    if (!act.length) { alert('取引がありません'); return; }
+    act.forEach(ac => {
+      const d = L[ac.c];
+      if (!d.it.length) return;
+      bodyHTML += '<h3 style="margin:24px 0 8px;font-size:15px;border-bottom:2px solid #2563eb;padding-bottom:4px;color:#1e40af">【' + ac.n + '】</h3>';
+      bodyHTML += buildLedgerHTML(d);
+    });
+  }
+  else if (type === 'trial') {
+    title = '合計残高試算表';
+    subtitle = fy + '年度';
+    const cl = {asset:"資産",liability:"負債",equity:"資本",revenue:"収益",expense:"費用"};
+    bodyHTML = '<table><thead><tr><th rowspan="2">科目</th><th rowspan="2">区分</th><th class="c" colspan="2">合計</th><th class="c" colspan="2">残高</th></tr><tr><th class="r">借方</th><th class="r">貸方</th><th class="r">借方</th><th class="r">貸方</th></tr></thead><tbody>';
+    let sD=0,sC=0;
+    T.rows.forEach(r => { sD+=r.dt;sC+=r.ct; bodyHTML+='<tr><td style="font-weight:600">'+r.n+'</td><td style="color:#64748b;font-size:12px">'+cl[r.cat]+'</td><td class="r">¥'+F(r.dt)+'</td><td class="r">¥'+F(r.ct)+'</td><td class="r">'+(r.bD?'¥'+F(r.bD):'-')+'</td><td class="r">'+(r.bC?'¥'+F(r.bC):'-')+'</td></tr>' });
+    bodyHTML += '<tr style="background:#e2e8f0;font-weight:800"><td colspan="2">合計</td><td class="r">¥'+F(sD)+'</td><td class="r">¥'+F(sC)+'</td><td class="r">¥'+F(T.tD)+'</td><td class="r">¥'+F(T.tC)+'</td></tr>';
+    bodyHTML += '</tbody></table>';
+    const bal = T.tD === T.tC;
+    bodyHTML += '<p style="margin-top:12px;padding:10px;border-radius:6px;font-weight:600;background:'+(bal?'#ecfdf5':'#fef2f2')+';color:'+(bal?'#065f46':'#991b1b')+'">'+(bal?'✓ 貸借一致（借方 ¥'+F(T.tD)+' ＝ 貸方 ¥'+F(T.tC)+'）':'✗ 貸借不一致（差額: ¥'+F(Math.abs(T.tD-T.tC))+'）')+'</p>';
+  }
+  else if (type === 'income') {
+    title = '損益計算書';
+    subtitle = '自 '+fy+'年1月1日　至 '+fy+'年12月31日';
+    bodyHTML = buildPLHTML(fin);
+  }
+  else if (type === 'balance') {
+    title = '貸借対照表';
+    subtitle = fy + '年12月31日現在';
+    bodyHTML = buildBSHTML(fin);
+  }
+
+  // Open print window
+  const w = window.open('', '_blank');
+  if (!w) { alert('ポップアップがブロックされています。ブラウザの設定でポップアップを許可してください。'); return; }
+  w.document.write('<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>'+title+'</title><style>');
+  w.document.write(`
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Noto Sans JP','Hiragino Sans','Meiryo',sans-serif;color:#0f172a;padding:20mm 15mm;font-size:11px;line-height:1.5}
+    .pdf-header{text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #3b82f6}
+    .pdf-header h1{font-size:20px;font-weight:800;margin-bottom:2px}
+    .pdf-header p{font-size:11px;color:#64748b}
+    .pdf-meta{display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:12px}
+    table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:12px}
+    th{padding:6px 8px;text-align:left;background:#f1f5f9;border:1px solid #e2e8f0;font-size:9px;font-weight:700;color:#475569}
+    th.r{text-align:right}th.c{text-align:center}
+    td{padding:5px 8px;border:1px solid #e2e8f0;font-size:10px}
+    td.r,.r{text-align:right}
+    tr:nth-child(even){background:#f8fafc}
+    h3{font-size:13px;margin:16px 0 6px}
+    .bs-wrap{display:flex;gap:16px}.bs-wrap>div{flex:1}
+    @media print{body{padding:10mm}@page{size:A4;margin:10mm}}
+  `);
+  w.document.write('</style></head><body>');
+  w.document.write('<div class="pdf-header"><h1>'+title+'</h1><p>'+subtitle+'</p></div>');
+  w.document.write('<div class="pdf-meta"><span>青色申告帳簿システム</span><span>出力日: '+dateStr+'</span></div>');
+  w.document.write(bodyHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 300);
+}
+
+function buildLedgerHTML(d) {
+  const cat=d.cat, so=[...d.it].sort((a,b)=>a.date.localeCompare(b.date)); let run=0;
+  let h='<table><thead><tr><th>日付</th><th>相手科目</th><th>摘要</th><th class="r">借方</th><th class="r">貸方</th><th class="r">残高</th></tr></thead><tbody>';
+  so.forEach(i=>{const isD=i.s==="d",dA=isD?i.am:0,cA=isD?0:i.am;if(cat==="asset"||cat==="expense")run+=dA-cA;else run+=cA-dA;h+='<tr><td>'+i.date+'</td><td>'+(isD?gN(i.ca):gN(i.da))+'</td><td>'+i.ds+'</td><td class="r">'+(dA?'¥'+F(dA):'')+'</td><td class="r">'+(cA?'¥'+F(cA):'')+'</td><td class="r" style="font-weight:700">¥'+F(run)+'</td></tr>'});
+  h+='<tr style="background:#e2e8f0;font-weight:700"><td colspan="3">合計</td><td class="r">¥'+F(d.dt)+'</td><td class="r">¥'+F(d.ct)+'</td><td></td></tr></tbody></table>';
+  return h;
+}
+
+function buildPLHTML(fin) {
+  const ri=Object.entries(fin.revenue),ei=Object.entries(fin.expense);
+  const si=ri.filter(([,v])=>v.g==="売上"),ori=ri.filter(([,v])=>v.g==="営業外収益");
+  const ci=ei.filter(([,v])=>v.g==="売上原価"),gi=ei.filter(([,v])=>v.g==="経費"),oei=ei.filter(([,v])=>v.g==="営業外費用");
+  const tS=si.reduce((s,[,v])=>s+v.am,0),tC=ci.reduce((s,[,v])=>s+v.am,0),gP=tS-tC,tG=gi.reduce((s,[,v])=>s+v.am,0),oI=gP-tG;
+  let h='<table><tbody>';
+  function sec(t,items){h+='<tr><td colspan="2" style="font-weight:700;background:#f1f5f9">'+t+'</td></tr>';items.forEach(([,v])=>{h+='<tr><td style="padding-left:20px">'+v.n+'</td><td class="r">¥'+F(v.am)+'</td></tr>'})}
+  function tot(l,a,big){h+='<tr style="background:'+(big?'#dbeafe':'#f1f5f9')+';font-weight:'+(big?800:700)+'"><td>'+l+'</td><td class="r">¥'+F(a)+'</td></tr>'}
+  if(si.length)sec("【売上高】",si);tot("売上高 合計",tS);
+  if(ci.length){sec("【売上原価】",ci);tot("売上総利益",gP)}
+  if(gi.length)sec("【経費】",gi);tot("営業利益",oI);
+  if(ori.length)sec("【営業外収益】",ori);if(oei.length)sec("【営業外費用】",oei);
+  tot("青色申告特別控除前の所得金額",fin.ni,true);
+  h+='</tbody></table>';return h;
+}
+
+function buildBSHTML(fin) {
+  const ai=Object.entries(fin.asset),li=Object.entries(fin.liability),eq=Object.entries(fin.equity);
+  function grp(items){const g={};items.forEach(([c,v])=>{if(!g[v.g])g[v.g]=[];g[v.g].push(v)});return g}
+  const aG=grp(ai),lG=grp(li),tLE=fin.t.liability+fin.t.equity+fin.ni,bal=fin.t.asset===tLE;
+  let h='<div class="bs-wrap"><div><h3 style="color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:4px;margin-bottom:8px">【資産の部】</h3><table><tbody>';
+  Object.entries(aG).forEach(([g,items])=>{h+='<tr><td colspan="2" style="font-weight:600;background:#eff6ff;color:#1e40af;font-size:10px">'+g+'</td></tr>';items.forEach(i=>{h+='<tr><td style="padding-left:16px">'+i.n+'</td><td class="r">¥'+F(i.am)+'</td></tr>'})});
+  h+='<tr style="background:#dbeafe;font-weight:800"><td>資産合計</td><td class="r">¥'+F(fin.t.asset)+'</td></tr></tbody></table></div>';
+  h+='<div><h3 style="color:#7e22ce;border-bottom:2px solid #9333ea;padding-bottom:4px;margin-bottom:8px">【負債・資本の部】</h3><table><tbody>';
+  Object.entries(lG).forEach(([g,items])=>{h+='<tr><td colspan="2" style="font-weight:600;background:#faf5ff;color:#7e22ce;font-size:10px">'+g+'</td></tr>';items.forEach(i=>{h+='<tr><td style="padding-left:16px">'+i.n+'</td><td class="r">¥'+F(i.am)+'</td></tr>'})});
+  h+='<tr style="background:#faf5ff;font-weight:700"><td>負債合計</td><td class="r">¥'+F(fin.t.liability)+'</td></tr>';
+  if(eq.length){h+='<tr><td colspan="2" style="font-weight:600;background:#faf5ff;color:#7e22ce;font-size:10px">資本</td></tr>';eq.forEach(([,v])=>{h+='<tr><td style="padding-left:16px">'+v.n+'</td><td class="r">¥'+F(v.am)+'</td></tr>'})}
+  h+='<tr><td style="padding-left:16px;font-weight:600;color:#059669">青色申告特別控除前所得</td><td class="r" style="color:#059669;font-weight:600">¥'+F(fin.ni)+'</td></tr>';
+  h+='<tr style="background:#e9d5ff;font-weight:800"><td>負債・資本合計</td><td class="r">¥'+F(tLE)+'</td></tr></tbody></table></div></div>';
+  h+='<p style="margin-top:12px;padding:10px;border-radius:6px;font-weight:600;background:'+(bal?'#ecfdf5':'#fef2f2')+';color:'+(bal?'#065f46':'#991b1b')+'">'+(bal?'✓ 貸借一致（資産 ¥'+F(fin.t.asset)+' ＝ 負債・資本 ¥'+F(tLE)+'）':'✗ 貸借不一致')+'</p>';
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 画面描画: 全データを再計算し、各タブのHTMLを生成・更新
+// Data-Driven方式: 仕訳配列(E)を唯一のソースとし、
+// 全ての帳簿を毎回再計算して描画する
+// ═══════════════════════════════════════════════════════════
+function render(){
+  const L=cL(),T=cT(L),fin=cF(L),fy=document.getElementById("fy").value,bal=T.tD===T.tC;
+  document.getElementById("sumBar").innerHTML='<div class="si"><span class="sl">仕訳数</span><span class="sv">'+E.length+'件</span></div><div class="si"><span class="sl">売上合計</span><span class="sv" style="color:var(--g6)">¥'+F(fin.t.revenue)+'</span></div><div class="si"><span class="sl">経費合計</span><span class="sv" style="color:var(--r6)">¥'+F(fin.t.expense)+'</span></div><div class="si"><span class="sl">所得</span><span class="sv" style="color:'+(fin.ni>=0?'var(--g6)':'var(--r6)')+';font-weight:800">¥'+F(fin.ni)+'</span></div><div class="si"><span class="sl">貸借差額</span><span class="sv" style="color:'+(bal?'var(--g6)':'var(--r6)')+'">'+(bal?'✓ 一致':'✗ 不一致')+'</span></div>';
+  const so=[...E].sort((a,b)=>a.date.localeCompare(b.date));
+  let jH='<table><thead><tr><th style="width:110px">日付</th><th>借方科目</th><th class="r">借方金額</th><th>貸方科目</th><th class="r">貸方金額</th><th>摘要</th><th style="width:100px">操作</th></tr></thead><tbody>';
+  if(!so.length)jH+='<tr><td colspan="7" class="em">仕訳がありません。上のフォームから入力してください。</td></tr>';
+  else so.forEach(e=>{jH+='<tr class="rw"><td>'+e.date+'</td><td class="dc">'+gN(e.da)+'</td><td class="r">¥'+F(e.am)+'</td><td class="cc">'+gN(e.ca)+'</td><td class="r">¥'+F(e.am)+'</td><td class="mu">'+e.ds+'</td><td><button class="ib" onclick="edE('+e.id+')">✏️</button><button class="ib" onclick="delE('+e.id+')">🗑️</button></td></tr>'});
+  jH+='</tbody></table>';document.getElementById("jTbl").innerHTML=jH;
+  const actA=AC.filter(a=>L[a.c].dt>0||L[a.c].ct>0);if(!SL&&actA.length)SL=actA[0].c;
+  let ch="";actA.forEach(a=>{ch+='<button class="cb'+(SL===a.c?' active':'')+'" onclick="selLA(\''+a.c+'\')">'+a.n+'</button>'});document.getElementById("lChips").innerHTML=ch;
+  const ld=L[SL];
+  if(ld&&ld.it.length){const cat=ld.cat,ls=[...ld.it].sort((a,b)=>a.date.localeCompare(b.date));let run=0;
+    let lH='<table><thead><tr><th style="width:110px">日付</th><th>相手科目</th><th>摘要</th><th class="r">借方</th><th class="r">貸方</th><th class="r">残高</th></tr></thead><tbody>';
+    ls.forEach(i=>{const isD=i.s==="d",dA=isD?i.am:0,cA=isD?0:i.am;if(cat==="asset"||cat==="expense")run+=dA-cA;else run+=cA-dA;lH+='<tr class="rw"><td>'+i.date+'</td><td style="font-weight:600">'+(isD?gN(i.ca):gN(i.da))+'</td><td class="mu">'+i.ds+'</td><td class="r" style="color:'+(dA?'var(--b6)':'var(--s3)')+'">'+(dA?'¥'+F(dA):'—')+'</td><td class="r" style="color:'+(cA?'var(--p6)':'var(--s3)')+'">'+(cA?'¥'+F(cA):'—')+'</td><td class="r bo">¥'+F(run)+'</td></tr>'});
+    lH+='<tr class="tot"><td colspan="3">合計</td><td class="r">¥'+F(ld.dt)+'</td><td class="r">¥'+F(ld.ct)+'</td><td></td></tr></tbody></table>';document.getElementById("lTbl").innerHTML=lH}
+  else document.getElementById("lTbl").innerHTML='<p class="em">取引のある勘定科目を選択してください。</p>';
+  const cl2={asset:"資産",liability:"負債",equity:"資本",revenue:"収益",expense:"費用"};
+  let tH='<table><thead><tr><th rowspan="2">科目</th><th rowspan="2">区分</th><th class="c" colspan="2">合計</th><th class="c" colspan="2">残高</th></tr><tr><th class="r">借方</th><th class="r">貸方</th><th class="r">借方</th><th class="r">貸方</th></tr></thead><tbody>';
+  let sD=0,sC=0;T.rows.forEach(r=>{sD+=r.dt;sC+=r.ct;tH+='<tr class="rw"><td style="font-weight:600">'+r.n+'</td><td class="mu" style="font-size:12px">'+cl2[r.cat]+'</td><td class="r">¥'+F(r.dt)+'</td><td class="r">¥'+F(r.ct)+'</td><td class="r" style="font-weight:'+(r.bD?700:400)+';color:'+(r.bD?'var(--b6)':'var(--s3)')+'">'+(r.bD?'¥'+F(r.bD):'—')+'</td><td class="r" style="font-weight:'+(r.bC?700:400)+';color:'+(r.bC?'var(--p6)':'var(--s3)')+'">'+(r.bC?'¥'+F(r.bC):'—')+'</td></tr>'});
+  tH+='<tr class="tot"><td colspan="2">合計</td><td class="r">¥'+F(sD)+'</td><td class="r">¥'+F(sC)+'</td><td class="r" style="color:var(--b6)">¥'+F(T.tD)+'</td><td class="r" style="color:var(--p6)">¥'+F(T.tC)+'</td></tr></tbody></table>';
+  document.getElementById("tTbl").innerHTML=tH;
+  document.getElementById("tSt").innerHTML='<div class="stb '+(bal?'ok':'ng')+'">'+(bal?'✓ 貸借一致（借方合計 ¥'+F(T.tD)+' ＝ 貸方合計 ¥'+F(T.tC)+'）':'✗ 貸借不一致（差額: ¥'+F(Math.abs(T.tD-T.tC))+'）')+'</div>';
+  const ri=Object.entries(fin.revenue),ei=Object.entries(fin.expense);
+  const si2=ri.filter(([,v])=>v.g==="売上"),ori=ri.filter(([,v])=>v.g==="営業外収益");
+  const ci2=ei.filter(([,v])=>v.g==="売上原価"),gi=ei.filter(([,v])=>v.g==="経費"),oei=ei.filter(([,v])=>v.g==="営業外費用");
+  const tS=si2.reduce((s,[,v])=>s+v.am,0),tC3=ci2.reduce((s,[,v])=>s+v.am,0),gP=tS-tC3,tG=gi.reduce((s,[,v])=>s+v.am,0),oI=gP-tG;
+  function plS(t,items,neg){let h='<tr class="sh"><td colspan="2">'+t+'</td></tr>';items.forEach(([,v])=>{h+='<tr class="rw si2"><td>'+v.n+'</td><td class="r" style="color:'+(neg?'var(--r6)':'var(--s9)')+'">¥'+F(v.am)+'</td></tr>'});return h}
+  function plT(l,a,g,c){return'<tr class="'+(g?'plgt':'plt')+'"><td>'+l+'</td><td class="r"'+(c?' style="color:'+c+'"':'')+'>¥'+F(a)+'</td></tr>'}
+  let iH='<div class="plc"><p>自 '+fy+'年1月1日　至 '+fy+'年12月31日</p></div><div class="tw"><table><tbody>';
+  if(si2.length)iH+=plS("【売上高】",si2,false);iH+=plT("売上高 合計",tS);
+  if(ci2.length){iH+=plS("【売上原価】",ci2,true);iH+=plT("売上総利益",gP)}
+  if(gi.length)iH+=plS("【経費】",gi,true);iH+=plT("営業利益",oI);
+  if(ori.length)iH+=plS("【営業外収益】",ori,false);if(oei.length)iH+=plS("【営業外費用】",oei,true);
+  iH+=plT("青色申告特別控除前の所得金額",fin.ni,true,fin.ni>=0?'var(--g6)':'var(--r6)');
+  iH+='</tbody></table></div>';document.getElementById("plC").innerHTML=iH;
+  const aI=Object.entries(fin.asset),lI=Object.entries(fin.liability),eI=Object.entries(fin.equity);
+  function grI(items){const g={};items.forEach(([c,v])=>{if(!g[v.g])g[v.g]=[];g[v.g].push({c,...v})});return g}
+  const aG=grI(aI),lG=grI(lI),tLE=fin.t.liability+fin.t.equity+fin.ni,bsB=fin.t.asset===tLE;
+  let bH='<div class="plc"><p>'+fy+'年12月31日現在</p></div><div class="bsg"><div><h3 class="bsh">【資産の部】</h3><table><tbody>';
+  Object.entries(aG).forEach(([g,items])=>{bH+='<tr class="ag"><td colspan="2">'+g+'</td></tr>';items.forEach(i=>{bH+='<tr class="rw"><td style="padding-left:20px">'+i.n+'</td><td class="r">¥'+F(i.am)+'</td></tr>'})});
+  bH+='<tr class="at"><td>資産合計</td><td class="r">¥'+F(fin.t.asset)+'</td></tr></tbody></table></div>';
+  bH+='<div><h3 class="bsh">【負債・資本の部】</h3><table><tbody>';
+  Object.entries(lG).forEach(([g,items])=>{bH+='<tr class="lg"><td colspan="2">'+g+'</td></tr>';items.forEach(i=>{bH+='<tr class="rw"><td style="padding-left:20px">'+i.n+'</td><td class="r">¥'+F(i.am)+'</td></tr>'})});
+  bH+='<tr class="lt"><td>負債合計</td><td class="r">¥'+F(fin.t.liability)+'</td></tr>';
+  if(eI.length){bH+='<tr class="lg"><td colspan="2">資本</td></tr>';eI.forEach(([,v])=>{bH+='<tr class="rw"><td style="padding-left:20px">'+v.n+'</td><td class="r">¥'+F(v.am)+'</td></tr>'})}
+  bH+='<tr class="ir"><td>青色申告特別控除前所得</td><td class="r">¥'+F(fin.ni)+'</td></tr>';
+  bH+='<tr class="et"><td>負債・資本合計</td><td class="r">¥'+F(tLE)+'</td></tr></tbody></table></div></div>';
+  bH+='<div class="stb '+(bsB?'ok':'ng')+'" style="margin-top:16px">'+(bsB?'✓ 貸借一致（資産 ¥'+F(fin.t.asset)+' ＝ 負債・資本 ¥'+F(tLE)+'）':'✗ 貸借不一致（資産 ¥'+F(fin.t.asset)+' ≠ 負債・資本 ¥'+F(tLE)+'）')+'</div>';
+  document.getElementById("bsC").innerHTML=bH
+}
+
+// ═══════════════════════════════════════════════════════════
+// 初期化: localStorage読込 → なければサンプルデータで開始 → 描画
+// ═══════════════════════════════════════════════════════════
+popSel();if(!load()){E=SAM.map(e=>({...e}));NI=7;save()}render();
+</script>
+</body>
+</html>
